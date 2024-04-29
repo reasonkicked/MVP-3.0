@@ -1,0 +1,271 @@
+locations:
+  centralus: cus
+  uksouth: uks
+  australiaeast: aue
+  westeurope: weu
+  ukwest: ukw
+  eastus2: eus
+  westus: wus
+  australiacentral: auc
+  germanywestcentral: gwc
+  germanynorth: gen
+  canadacentral: cac
+  northeurope: neu
+  australiasoutheast: ase
+
+defaults:
+  max_length: 80
+  regex: '(^[^a-zA-Z])|[^a-zA-Z0-9-]|([^a-zA-Z0-9]$)'
+  lower: false
+  separator: "-"
+  application_name: true
+
+
+resources:
+# A
+  application_gateway:
+    prefix: agw
+
+  application_insights:
+    prefix: appi
+    max_length: 260
+
+  application_insights_standard_web_test:
+    prefix: swt
+    max_length: 260
+
+  application_security_group:
+    prefix: asg
+
+  automation_account:
+    prefix: aa
+    max_length: 50
+
+  app_service:
+    prefix: apps
+
+  app_service_plan:
+    prefix: asp
+
+  analysis_service:
+    prefix: aas
+    max_length: 63
+    lower: true
+    regex: '[^a-z0-9]'
+
+# B
+  bastion_host:
+    prefix: bas
+
+# C
+  container_registry:
+    prefix: acr
+    max_length: 50
+    separator: ""
+    regex: '[^a-z0-9]'
+
+  api_connection:
+    prefix: con
+
+# D
+  data_factory:
+    prefix: adf
+    max_length: 63
+
+  data_share_account:
+    prefix: ds
+    max_length: 90
+
+  on_prem_data_gateway:
+    prefix: dg
+    max_length: 63
+
+  dns_private_resolver:
+    prefix: dnspr
+    max_length: 63
+
+  dns_private_resolver_inbound_endpoint:
+    prefix: dnsprin
+    max_length: 63
+
+  dns_private_resolver_outbound_endpoint:
+    prefix: dnsprout
+    max_length: 63
+
+  dns_private_resolver_forwaring_ruleset:
+    prefix: fwdruleset
+    max_length: 63
+
+  dns_private_resolver_forwaring_rule:
+    prefix: fwdrule
+    max_length: 63
+
+# E
+  eventhub_namespace:
+    prefix: evhns
+    max_length: 50
+
+  eventhub:
+    prefix: evh
+    max_length: 256
+
+# F
+  firewall:
+    prefix: afw
+
+  firewall_policy:
+    prefix: afwp
+
+  failover_group:
+    prefix: fg
+
+# I
+  ip_group:
+    prefix: ipgr
+
+# K
+  key_vault:
+    prefix: ""
+    max_length: 24
+
+  kubernetes_cluster:
+    prefix: "aks"
+    max_length: 63
+
+# L
+  lb:
+    prefix: lb
+
+  linux_virtual_machine_scale_set:
+    prefix: vmss
+    max_length: 64
+
+  log_analytics_workspace:
+    prefix: log
+    max_length: 63
+
+  logic_app_workflow:
+    prefix: logic
+    max_length: 63
+
+# M
+  managed_disk:
+    prefix: dsk
+
+  mssql_server:
+    prefix: sql
+
+  mssql_database:
+    prefix: sqldb
+
+  mssql_elasticpool:
+    prefix: sqlep
+
+  monitor_action_group:
+    prefix: ag
+
+# N
+  nat_gateway:
+    prefix: ng
+
+  network_interface:
+    prefix: nic
+
+  network_security_group:
+    prefix: nsg
+
+  network_watcher:
+    prefix: nw
+
+# P
+  postgresql_server:
+    prefix: psql
+
+  postgresql_database:
+    prefix: psqldb
+
+  public_ip:
+    prefix: pip
+
+  public_ip_prefix:
+    prefix: ippre
+
+  private_endpoint:
+    prefix: pe
+
+# R
+  resource_group:
+    prefix: rg
+    max_length: 90
+
+  route_table:
+    prefix: rt
+
+  redis:
+    prefix: redis
+
+# S
+  shared_image:
+    prefix: si
+
+  shared_image_gallery:
+    prefix: gal
+    regex: '(^[^a-zA-Z0-9])|[^a-zA-Z0-9.]|([^a-zA-Z0-9]$)'
+
+  servicebus_namespace:
+    prefix: sb
+    max_length: 50
+
+  servicebus_queue:
+    prefix: sbq
+    max_length: 260
+
+  servicebus_topic:
+    prefix: sbt
+    max_length: 260
+
+  storage_account:
+    prefix: ""
+    separator: ""
+    max_length: 24
+    lower: true
+    regex: '[^a-z0-9]'
+
+  subnet:
+    prefix: snet
+# T
+  traffic_manager_profile:
+    prefix: traf
+    max_length: 63
+
+  traffic_manager_endpoint:
+    prefix: trafe
+    max_length: 63
+
+# U
+  user_assigned_identity:
+    prefix: id
+    max_length: 128
+
+# V
+  virtual_machine:
+    prefix: vm
+    max_length: 64
+
+  virtual_machine_hostname:
+    prefix: ""
+    separator: ""
+    application_name: false
+
+  virtual_network:
+    prefix: vnet
+    max_length: 64
+
+# W
+  windows_virtual_machine:
+    prefix: vm
+    max_length: 64
+
+  windows_virtual_machine_scale_set:
+    prefix: vmss
+    max_length: 64
