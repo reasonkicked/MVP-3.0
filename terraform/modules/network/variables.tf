@@ -20,8 +20,11 @@ variable "functions" {
   default = []
 }
 
-
 variable "resource_instance" {
   type    = number
   default = "01"
+}
+
+variable "tooling_vnet_ip_range" {
+  default = ""
 }
