@@ -9,8 +9,9 @@ module "conventions" {
   resource_instance    = var.resource_instance
 }
 
+module "network_resource_group" {
+  source = "../../modules/bits/resource_group"
 
-resource "azurerm_resource_group" "rg" {
   name     = module.conventions.names.network.azurerm_resource_group
   location = var.location
 }
