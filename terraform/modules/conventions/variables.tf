@@ -28,8 +28,8 @@ variable "application_name" {
   type = string
 
   validation {
-    condition     = contains(["avp",  "alerts"], var.application_name)
-    error_message = "Only avp, alerts values are allowed."
+    condition     = contains(["mvp", "alerts"], var.application_name)
+    error_message = "Only mvp, alerts values are allowed."
   }
 
   description = ""

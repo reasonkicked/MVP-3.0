@@ -233,6 +233,20 @@ resources:
 
   subnet:
     prefix: snet
+
+  subnet_public:
+    prefix: snet-pub
+
+  subnet_backend:
+    prefix: snet-backend
+
+  subnet_iaas:
+    prefix: snet-iaas
+
+  subnet_paas:
+    prefix: snet-paas
+
+
 # T
   traffic_manager_profile:
     prefix: traf
