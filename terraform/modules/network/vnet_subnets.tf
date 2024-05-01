@@ -6,8 +6,6 @@ resource "azurerm_virtual_network" "virtual_network" {
 
   address_space = ["172.31.144.0/22"]
 
-  #dns_servers = compact(split(";", var.dns_servers))
-
 }
 
 locals {
