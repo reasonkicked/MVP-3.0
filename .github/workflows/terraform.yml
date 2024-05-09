@@ -3,27 +3,24 @@ name: Terraform
 on:
   push:
     branches:
-      - master
+    - master
 
 jobs:
-  terraform:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
+    - uses: actions/checkout@v2
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: 1.0.0
-
     - name: Terraform Init
       run: terraform init
-
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
     - name: Terraform Plan
       run: terraform plan
-
     - name: Terraform Apply
-      if: github.event_name == 'push' && contains(github.ref, 'master')
-      run: terraform apply -auto-approve
+      run: terraform apply -auto-approve -var-file=non-pd.tfvars
+
