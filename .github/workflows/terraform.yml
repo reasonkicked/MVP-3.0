@@ -10,9 +10,6 @@ permissions:
   contents: read
   id-token: write
 
-env:
-  ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
-
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -28,7 +25,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
       - name: Terraform Init
-        run: terraform init -backend-config="access_key=${{ env.ARM_ACCESS_KEY }}"
+        run: terraform init
       - name: Terraform Plan
         run: terraform plan -var-file=non-pd.tfvars
       - name: Terraform Apply
