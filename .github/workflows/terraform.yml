@@ -3,7 +3,8 @@ name: Terraform
 on:
   push:
     branches:
-    - master
+      - 'master'
+      - 'feature/**'
   workflow_dispatch:
     inputs:
       logLevel:
