@@ -67,6 +67,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: List directory contents
+        run: ls -la
       - name: Azure Login
         uses: azure/login@v1
         with:
@@ -78,7 +80,6 @@ jobs:
           cluster-name: 'aks-dv-mvp-em01-aks-weu-01' #needs to be a parameter
           resource-group: 'rg-dv-mvp-em01-aks-weu-01' #needs to be a parameter
       - name: Deploy to AKS
-        working-directory: ./
         run: |
-          kubectl apply -f ./k8s/deployment.yaml
-          kubectl apply -f ./k8s/service.yaml
+          kubectl apply -f ./k8s/deployment.yml
+          kubectl apply -f ./k8s/service.yml
