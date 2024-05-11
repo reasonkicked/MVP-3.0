@@ -20,7 +20,7 @@ env:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && contains(github.event.commits[0].message, '[skip terraform]')
+    #if: github.event_name == 'push' && contains(github.event.commits[0].message, '[skip terraform]')
     defaults:
       run:
         working-directory: 'terraform/modules/network/'
