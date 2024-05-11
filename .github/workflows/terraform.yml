@@ -40,7 +40,7 @@ jobs:
         run: terraform apply -auto-approve -var-file=non-pd.tfvars
 
   build_and_push_image:
-    needs: terraform
+    #needs: terraform
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
