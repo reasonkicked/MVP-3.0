@@ -7,7 +7,7 @@ on:
       - 'feature/**'
     paths:
       - 'terraform/**/*'
-      -
+
 permissions:
   contents: read
   id-token: write
