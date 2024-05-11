@@ -5,8 +5,6 @@ on:
     branches:
       - 'master'
       - 'feature/**'
-    #paths:
-    #  - 'terraform/**/*'
 
 permissions:
   contents: read
@@ -17,11 +15,10 @@ env:
   REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
   REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
   REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-  IMAGE_NAME: 'MVP-3.0'
+  IMAGE_NAME: 'mvp-3.0'
 
 jobs:
   terraform:
-    #if: github.event_name == 'push' && contains(github.event.commits.*.added, startsWith('terraform/'))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -43,7 +40,6 @@ jobs:
 
   build_and_push_image:
     needs: terraform
-    #if: success() && needs.terraform.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -65,7 +61,6 @@ jobs:
 
   deploy_to_aks:
     needs: build_and_push_image
-    #if: success() && needs.build_and_push_image.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
