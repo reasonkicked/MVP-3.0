@@ -1,4 +1,4 @@
-name: Terraform
+name: Terraform and Deploy
 
 on:
   push:
@@ -12,6 +12,10 @@ permissions:
 
 env:
   ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
+  REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+  IMAGE_NAME: 'MVP-3.0'
 
 jobs:
   terraform:
@@ -33,3 +37,44 @@ jobs:
         run: terraform plan -var-file=non-pd.tfvars
       - name: Terraform Apply
         run: terraform apply -auto-approve -var-file=non-pd.tfvars
+
+  build_and_push_image:
+    needs: terraform
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to ACR
+        uses: docker/login-action@v1
+        with:
+          registry: 'acrdvmvpem01acrweu01.azurecr.io'
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ env.REGISTRY_PASSWORD }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./src/
+          file: ./Docker/app/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+
+  deploy_to_aks:
+    needs: build_and_push_image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+      - name: Set AKS context
+        uses: azure/aks-set-context@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+          cluster-name: your-aks-cluster-name
+          resource-group: your-aks-resource-group
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f ./k8s/deployment.yaml
+          kubectl apply -f ./k8s/service.yaml
