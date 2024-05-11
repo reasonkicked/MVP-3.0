@@ -12,13 +12,22 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
   dns_prefix          = "exampleaks1"
 
   default_node_pool {
-    name       = "default"
-    node_count = 1
-    vm_size    = "Standard_D2_v2"
+    name           = "default"
+    node_count     = 1
+    vm_size        = "Standard_D2_v2"
+    vnet_subnet_id = azurerm_subnet.public_subnet.id
   }
 
   identity {
     type = "SystemAssigned"
+  }
+
+  network_profile {
+    network_plugin     = "azure"
+    service_cidr       = local.subnets[2]
+    dns_service_ip     = cidrhost(local.subnets[2], 10)
+    docker_bridge_cidr = "172.17.0.1/16"
+    outbound_type      = "loadBalancer"
   }
 
   tags = {
