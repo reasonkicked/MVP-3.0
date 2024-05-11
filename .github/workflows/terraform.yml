@@ -5,7 +5,9 @@ on:
     branches:
       - 'master'
       - 'feature/**'
-
+    paths:
+      - 'terraform/**/*'
+      -
 permissions:
   contents: read
   id-token: write
@@ -19,6 +21,7 @@ env:
 
 jobs:
   terraform:
+    if: github.event_name == 'push' && contains(github.event.commits.*.added, startsWith('terraform/'))
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -40,6 +43,7 @@ jobs:
 
   build_and_push_image:
     needs: terraform
+    if: success() && needs.terraform.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -54,13 +58,14 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: ./src/
+          context: ./src
           file: ./Docker/app/Dockerfile
           push: true
           tags: ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
 
   deploy_to_aks:
     needs: build_and_push_image
+    if: success() && needs.build_and_push_image.result != 'skipped'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
