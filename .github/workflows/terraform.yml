@@ -41,6 +41,8 @@ jobs:
 
   build_and_push_image:
     #needs: terraform
+    if: github.event_name == 'push' && contains(github.event.commits[0].message, '[skip build]')
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -76,6 +78,7 @@ jobs:
           cluster-name: 'aks-dv-mvp-em01-aks-weu-01' #needs to be a parameter
           resource-group: 'rg-dv-mvp-em01-aks-weu-01' #needs to be a parameter
       - name: Deploy to AKS
+        working-directory: ./
         run: |
           kubectl apply -f ./k8s/deployment.yaml
           kubectl apply -f ./k8s/service.yaml
