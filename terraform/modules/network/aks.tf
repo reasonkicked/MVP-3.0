@@ -24,9 +24,9 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
 
   network_profile {
     network_plugin     = "azure"
-    service_cidr       = "10.0.0.0/16" # Example non-overlapping range
-    dns_service_ip     = "10.0.0.10"   # An IP within the new service_cidr
-    docker_bridge_cidr = "172.17.0.1/16"
+    service_cidr       = "10.10.4.0/22" # A non-overlapping range within the new VNET address space
+    dns_service_ip     = "10.10.4.10"   # An IP within the new service_cidr
+    docker_bridge_cidr = "172.17.0.0/16" # Default Docker bridge network range
     outbound_type      = "loadBalancer"
   }
 

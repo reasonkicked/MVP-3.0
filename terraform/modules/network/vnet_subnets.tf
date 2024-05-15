@@ -4,7 +4,7 @@ resource "azurerm_virtual_network" "virtual_network" {
   location            = var.location
   resource_group_name = module.network_resource_group.name
 
-  address_space = ["172.31.144.0/22"]
+  address_space = ["10.10.0.0/22"]
 
 }
 
