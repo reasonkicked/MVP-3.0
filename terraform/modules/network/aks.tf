@@ -18,6 +18,7 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     node_count     = 1
     vm_size        = "Standard_D2_v2"
     vnet_subnet_id = azurerm_subnet.public_subnet.id
+    sku_tier       = "Paid"
   }
 
   identity {
@@ -43,7 +44,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pool" {
   vm_size               = "Standard_DS2_v2"
   node_count            = 2
   vnet_subnet_id        = azurerm_subnet.public_subnet.id # Replace with your desired subnet
-  sku_tier              = "Paid"
+
 }
 
 
