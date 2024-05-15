@@ -51,7 +51,7 @@ jobs:
       - name: Login to ACR
         uses: docker/login-action@v1
         with:
-          registry: 'acrdvmvpem01acrweu01.azurecr.io' #needs to be a parameter
+          registry: 'acrdvmvpem01acrgwc01.azurecr.io' #needs to be a parameter
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_PASSWORD }}
       - name: Unset DOCKER_HOST
@@ -79,8 +79,8 @@ jobs:
         uses: azure/aks-set-context@v1
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
-          cluster-name: 'aks-dv-mvp-em01-aks-weu-01' #needs to be a parameter
-          resource-group: 'rg-dv-mvp-em01-aks-weu-01' #needs to be a parameter
+          cluster-name: 'aks-dv-mvp-em01-aks-gwc-01' #needs to be a parameter
+          resource-group: 'rg-dv-mvp-em01-aks-gwc-01' #needs to be a parameter
       - name: Deploy to AKS
         run: |
           kubectl apply -f ./k8s/deployment.yml
