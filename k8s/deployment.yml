@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: python-app
-        image: acrdvmvpem01acrgwc01.azurecr.io/python-app:latest
+        image: acrdvmvpem01acruks01.azurecr.io/mvp-3-0:latest
         ports:
         - containerPort: 80
         resources:
