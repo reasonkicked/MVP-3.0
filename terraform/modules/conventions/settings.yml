@@ -132,6 +132,13 @@ resources:
     prefix: "aks"
     max_length: 63
 
+  kubernetes_cluster_node_pool:
+    prefix: ""
+    separator: ""
+    max_length: 24
+    lower: true
+    regex: '[^a-z0-9]'
+
 # L
   lb:
     prefix: lb
