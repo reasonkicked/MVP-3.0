@@ -46,20 +46,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.3.0
-
-      - name: Restart Docker service
-        run: sudo systemctl restart docker
-
+        with:
+          config-inline: |
+            [dns]
+              nameservers="8.8.8.8"
       - name: Login to ACR
         uses: docker/login-action@v3.1.0
         with:
           registry: 'acrdvmvpem01acrgwc01.azurecr.io' #needs to be a parameter
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_PASSWORD }}
-
+      - name: Unset DOCKER_HOST
+        run: unset DOCKER_HOST
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -67,7 +67,6 @@ jobs:
           file: ./docker/app/Dockerfile
           push: true
           tags: ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
-
 
   deploy_to_aks:
     needs: build_and_push_image
