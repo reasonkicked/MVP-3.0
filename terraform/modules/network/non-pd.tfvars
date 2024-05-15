@@ -1,4 +1,4 @@
-location              = "UKSouth"
+location              = "WestEurope"
 environment           = "dv"
 application_name      = "mvp"
 application_instance  = "em01"
