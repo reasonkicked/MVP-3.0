@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mvp-3-0-app
+  name: mvp-3.0-app
 spec:
   replicas: 2
   selector:
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: python-app
-        image: acrdvmvpem01acruks01.azurecr.io/mvp-3-0:latest
+        image: acrdvmvpem01acruks01.azurecr.io/mvp-3.0:latest
         ports:
         - containerPort: 80
         resources:
