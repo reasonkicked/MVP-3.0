@@ -51,12 +51,11 @@ jobs:
       - name: Login to ACR
         uses: docker/login-action@v1
         with:
-          buildkitd-config-inline: |
-            [dns]
-              nameservers=["8.8.8.8"]
           registry: 'acrdvmvpem01acruks01.azurecr.io' #needs to be a parameter
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_PASSWORD }}
+      - name: Unset DOCKER_HOST
+        run: unset DOCKER_HOST
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
