@@ -5,18 +5,22 @@ module "aks_resource_group" {
   location = var.location
 }
 
+resource "azurerm_kubernetes_cluster_node_pool" "node_pool" {
+  name                  = module.conventions.names.aks.kubernetes_cluster
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks_cluster.id
+  vm_size               = "Standard_DS2_v2"
+  node_count            = 3
+  vnet_subnet_id        = azurerm_subnet.public_subnet.id # Replace with your desired subnet
+
+  // Other configurations...
+}
+
 resource "azurerm_kubernetes_cluster" "aks_cluster" {
   name                = module.conventions.names.aks.kubernetes_cluster
   location            = var.location
   resource_group_name = module.aks_resource_group.name
   dns_prefix          = "exampleaks3"
 
-  default_node_pool {
-    name           = "default"
-    node_count     = 1
-    vm_size        = "Standard_D2_v2"
-    vnet_subnet_id = azurerm_subnet.public_subnet.id
-  }
 
   identity {
     type = "SystemAssigned"
