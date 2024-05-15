@@ -9,7 +9,7 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
   name                = module.conventions.names.aks.kubernetes_cluster
   location            = var.location
   resource_group_name = module.aks_resource_group.name
-  dns_prefix          = "exampleaks1"
+  dns_prefix          = "exampleaks3"
 
   default_node_pool {
     name           = "default"
