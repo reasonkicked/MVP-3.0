@@ -1,0 +1,1 @@
+az ad sp create-for-rbac --name "mvp30spn-dev" --role contributor --scopes "/subscriptions/<subscription>" --json-auth

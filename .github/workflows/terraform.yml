@@ -12,15 +12,11 @@ permissions:
 
 env:
   ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
-  REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-  REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
   IMAGE_NAME: 'mvp-3.0'
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
-    #if: github.event_name == 'push' && contains(github.event.commits[0].message, '[skip terraform]')
     defaults:
       run:
         working-directory: 'terraform/modules/network/'
