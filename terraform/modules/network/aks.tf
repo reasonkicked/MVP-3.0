@@ -63,12 +63,12 @@ resource "azurerm_public_ip" "public_ip" {
 }
 
 resource "azurerm_network_interface" "nic" {
-  name                = module.conventions.names.aks.nic
+  name                = module.conventions.names.aks.network_interface
   location            = var.location
   resource_group_name = module.aks_resource_group.name
 
   ip_configuration {
-    name                          = module.conventions.names.aks.nic
+    name                          = module.conventions.names.aks.network_interface
     subnet_id                     = azurerm_subnet.public_subnet.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.public_ip.id
