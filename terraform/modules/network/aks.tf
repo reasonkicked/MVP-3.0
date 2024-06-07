@@ -69,14 +69,14 @@ resource "azurerm_network_interface" "nic" {
 
   ip_configuration {
     name                          = module.conventions.names.aks.network_interface
-    subnet_id                     = azurerm_subnet.public_subnet.id
+    subnet_id                     = azurerm_subnet.backend_subnet.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.public_ip.id
   }
 }
 
 resource "azurerm_windows_virtual_machine" "management_vm" {
-  name                = "myVM"
+  name                = "BastionHost"
   resource_group_name = module.aks_resource_group.name
   location            = var.location
   size                = "Standard_DS1_v2"
