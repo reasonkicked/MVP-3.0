@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: python-app-service
+  name: mvp-3-0-app-service
 spec:
   type: LoadBalancer
   ports:
@@ -9,4 +9,47 @@ spec:
       targetPort: 80
       protocol: TCP
   selector:
-    app: python-app
+    app: mvp-3.0-app
+
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mvp-3-0-app-tls
+data:
+  tls.crt: base64-encoded-certificate
+  tls.key: base64-encoded-private-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mvp-3-0-app-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 443
+      targetPort: 80
+      protocol: TCP
+  selector:
+    app: mvp-3.0-app
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mvp-3-0-app-ingress
+spec:
+  tls:
+  - hosts:
+    - your-domain.com
+    secretName: mvp-3-0-app-tls
+  rules:
+  - host: your-domain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mvp-3-0-app-service
+            port:
+              number: 80
