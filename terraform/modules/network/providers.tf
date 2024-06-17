@@ -4,7 +4,7 @@ terraform {
   backend "azurerm" {
     storage_account_name = "mvp30sadev"
     container_name       = "terraform"
-    key                  = "tf.tfstate"
+    key                  = "terraform.tfstate"
   }
 
 }
