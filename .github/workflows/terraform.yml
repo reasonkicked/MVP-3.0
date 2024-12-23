@@ -26,23 +26,14 @@ jobs:
         uses: azure/login@v1
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
-      - name: Debug Path 0
-        run: pwd
-      - name: Debug Path 1
-        run: ls -l
-      - name: Check Environment Directory
-        run: ls -l /home/runner/work/MVP-3.0/MVP-3.0/terraform/environments
-      - name: Debug Path 2
-        run: ls -l ../../../environments/
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
       - name: Terraform Init
         run: terraform init -backend-config="access_key=${{ env.ARM_ACCESS_KEY }}"
       - name: Terraform Plan
-        run: terraform plan -var-file=../../../environments/non-pd.tfvars
+        run: terraform plan -var-file=$GITHUB_WORKSPACE/terraform/environments/non-pd.tfvars
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file=../../../environments/non-pd.tfvars
+        run: terraform apply -auto-approve -var-file=$GITHUB_WORKSPACE/terraform/environments/non-pd.tfvars
 
   build_and_push_image:
     needs: terraform
