@@ -28,7 +28,6 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
     network_plugin     = "azure"
     service_cidr       = "10.10.4.0/22"
     dns_service_ip     = "10.10.4.10"
-    docker_bridge_cidr = "172.17.0.0/16"
     outbound_type      = "loadBalancer"
   }
 
