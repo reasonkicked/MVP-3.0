@@ -75,7 +75,7 @@ resource "azurerm_network_interface" "nic" {
 }
 
 resource "azurerm_windows_virtual_machine" "vm" {
-  name                = "myVM"
+  name                = "ManagementVM"
   resource_group_name = module.aks_resource_group.name
   location            = var.location
   size                = "Standard_DS1_v2"

@@ -139,7 +139,7 @@ locals {
 # PaaS network security group
 
 resource "azurerm_network_security_group" "paas_nsg" {
-  name                = "${azurerm_subnet.paas_subnet.name}-NSG"
+  name                = "${azurerm_subnet.paas_subnet.name}-nsg"
   location            = var.location
   resource_group_name = module.network_resource_group.name
 }
