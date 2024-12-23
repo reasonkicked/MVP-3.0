@@ -30,6 +30,8 @@ jobs:
         run: pwd
       - name: Debug Path 1
         run: ls -l
+      - name: Check Environment Directory
+        run: ls -l /home/runner/work/MVP-3.0/MVP-3.0/terraform/environments
       - name: Debug Path 2
         run: ls -l ../../../environments/
 
