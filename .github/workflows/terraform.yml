@@ -33,55 +33,55 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var-file=$GITHUB_WORKSPACE/terraform/environments/non-pd.tfvars
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file=$GITHUB_WORKSPACE/terraform/environments/non-pd.tfvars
+        run: terraform apply -auto-approve -var-file=../../../terraform/environments/non-pd.tfvars
 
-  build_and_push_image:
-    needs: terraform
-    if: github.event_name == 'push' && contains(github.event.commits[0].message, '[skip build]')
-
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.3.0
-        with:
-          buildkitd-config-inline: |
-            [dns]
-              nameservers=["8.8.8.8"]
-      - name: Login to ACR
-        uses: docker/login-action@v3.1.0
-        with:
-          registry: 'acrdvmvpem01acrgwc01.azurecr.io' #needs to be a parameter
-          username: ${{ env.REGISTRY_USERNAME }}
-          password: ${{ env.REGISTRY_PASSWORD }}
-      - name: Unset DOCKER_HOST
-        run: unset DOCKER_HOST
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./docker/app/Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
-
-  deploy_to_aks:
-    needs: terraform
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: List directory contents
-        run: ls -la
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: '${{ secrets.AZURE_CREDENTIALS }}'
-      - name: Set AKS context
-        uses: azure/aks-set-context@v1
-        with:
-          creds: '${{ secrets.AZURE_CREDENTIALS }}'
-          cluster-name: 'aks-dv-mvp-em01-aks-gwc-01' #needs to be a parameter
-          resource-group: 'rg-dv-mvp-em01-aks-gwc-01' #needs to be a parameter
-      - name: Deploy to AKS
-        run: |
-          kubectl apply -f ./k8s/deployment.yml
-          kubectl apply -f ./k8s/service.yml
+#  build_and_push_image:
+#    needs: terraform
+#    if: github.event_name == 'push' && contains(github.event.commits[0].message, '[skip build]')
+#
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v3.3.0
+#        with:
+#          buildkitd-config-inline: |
+#            [dns]
+#              nameservers=["8.8.8.8"]
+#      - name: Login to ACR
+#        uses: docker/login-action@v3.1.0
+#        with:
+#          registry: 'acrdvmvpem01acrgwc01.azurecr.io' #needs to be a parameter
+#          username: ${{ env.REGISTRY_USERNAME }}
+#          password: ${{ env.REGISTRY_PASSWORD }}
+#      - name: Unset DOCKER_HOST
+#        run: unset DOCKER_HOST
+#      - name: Build and push
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: .
+#          file: ./docker/app/Dockerfile
+#          push: true
+#          tags: ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+#
+#  deploy_to_aks:
+#    needs: terraform
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: List directory contents
+#        run: ls -la
+#      - name: Azure Login
+#        uses: azure/login@v1
+#        with:
+#          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+#      - name: Set AKS context
+#        uses: azure/aks-set-context@v1
+#        with:
+#          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+#          cluster-name: 'aks-dv-mvp-em01-aks-gwc-01' #needs to be a parameter
+#          resource-group: 'rg-dv-mvp-em01-aks-gwc-01' #needs to be a parameter
+#      - name: Deploy to AKS
+#        run: |
+#          kubectl apply -f ./k8s/deployment.yml
+#          kubectl apply -f ./k8s/service.yml
