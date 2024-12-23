@@ -10,7 +10,7 @@ resource "azurerm_virtual_network" "virtual_network" {
 
 locals {
   # https://www.terraform.io/language/functions/cidrsubnets
-  subnets = cidrsubnets(azurerm_virtual_network.virtual_network.address_space[0], 1, 3, 3, 3, 3)
+  subnets = cidrsubnets(azurerm_virtual_network.virtual_network.address_space[0], 1, 3, 3, 3, 3) #test
 }
 
 
