@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.15"
+  required_version = ">= 1.0"
 
   backend "azurerm" {
     storage_account_name = "mvp30sabackend"
