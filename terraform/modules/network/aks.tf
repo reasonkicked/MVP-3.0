@@ -98,5 +98,25 @@ resource "azurerm_windows_virtual_machine" "vm" {
   }
 }
 
+# Auto-shutdown schedule
+resource "azurerm_dev_test_schedule" "auto_shutdown" {
+  name                = "shutdown-schedule"
+  location            = var.location
+  resource_group_name = module.aks_resource_group.name
+  lab_name            = azurerm_windows_virtual_machine.vm.name
+  task_type           = "ComputeVMShutdownTask"
+  status              = "Enabled"
+
+  daily_recurrence {
+    time = "1900" # Time in HHMM format (e.g., 1900 is 7:00 PM)
+  }
+
+  notification_settings {
+    status = "Disabled" # Enable if you want notifications
+  }
+
+  time_zone_id = "UTC" # Adjust for your time zone
+}
+
 
 
