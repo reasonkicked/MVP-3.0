@@ -2,9 +2,9 @@ terraform {
   required_version = ">= 0.15"
 
   backend "azurerm" {
-    storage_account_name = "mvp30sadev"
-    container_name       = "terraform"
-    key                  = "terraform.tfstate"
+    storage_account_name = "mvp30sabackend"
+    container_name       = "terraform-states"
+    key                  = "${var.environment}/terraform.tfstate"
   }
 
   required_providers {
