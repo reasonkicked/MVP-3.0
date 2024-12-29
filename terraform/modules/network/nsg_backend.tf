@@ -223,7 +223,7 @@ locals {
 # Backend network security group
 
 resource "azurerm_network_security_group" "backend_nsg" {
-  name                = "${azurerm_subnet.backend_subnet.name}-NSG"
+  name                = "${azurerm_subnet.backend_subnet.name}-nsg"
   location            = var.location
   resource_group_name = module.network_resource_group.name
 }

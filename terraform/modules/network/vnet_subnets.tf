@@ -4,13 +4,13 @@ resource "azurerm_virtual_network" "virtual_network" {
   location            = var.location
   resource_group_name = module.network_resource_group.name
 
-  address_space = ["172.31.144.0/22"]
+  address_space = ["10.10.0.0/22"]
 
 }
 
 locals {
-  # https://www.terraform.io/language/functions/cidrsubnets
-  subnets = cidrsubnets(azurerm_virtual_network.virtual_network.address_space[0], 1, 3, 3, 3, 3)
+  # Convert address_space set to a list before indexing
+  subnets = cidrsubnets(tolist(azurerm_virtual_network.virtual_network.address_space)[0], 1, 3, 3, 3, 3)
 }
 
 
