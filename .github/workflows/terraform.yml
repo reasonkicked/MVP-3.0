@@ -1,4 +1,4 @@
-name: Terraform and Deploy
+name: Terraform Deployment
 
 on:
   workflow_dispatch:  # Manual trigger to select environment
