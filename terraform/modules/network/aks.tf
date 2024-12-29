@@ -96,6 +96,9 @@ resource "azurerm_windows_virtual_machine" "vm" {
     sku       = "2019-Datacenter"
     version   = "latest"
   }
+
+  vm_agent_platform_updates_enabled = true
+
 }
 
 resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown_schedule" {
