@@ -1,87 +1,70 @@
 name: Terraform and Deploy
 
 on:
-  push:
-    branches:
-      - 'master'
-      - 'feature/**'
+  workflow_dispatch:  # Manual trigger to select environment
+    inputs:
+      environment:
+        description: "Environment to deploy (dev, qa, prod)"
+        required: true
+        default: "dev"
 
 permissions:
   contents: read
   id-token: write
 
 env:
-  ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
   IMAGE_NAME: 'mvp-3.0'
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}  # Use GitHub environment for protection rules
     defaults:
       run:
         working-directory: 'terraform/modules/network/'
     steps:
+      # Check out the code
       - uses: actions/checkout@v2
+
+      # Log in to Azure
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
+      # Set the environment-specific variables
+      - name: Set Environment Variables
+        run: |
+          echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          echo "TFVARS_FILE=${{ github.event.inputs.environment }}.tfvars" >> $GITHUB_ENV
+          echo "BACKEND_KEY=${{ github.event.inputs.environment }}.tfstate" >> $GITHUB_ENV
+
+      # Debug environment variables
+      - name: Debug Environment Variables
+        run: |
+          echo "Environment: ${{ env.ENVIRONMENT }}"
+          echo "Variables file: ${{ env.TFVARS_FILE }}"
+          echo "Backend key: ${{ env.BACKEND_KEY }}"
+
+      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
-      - name: Terraform Init
-        run: terraform init -backend-config="access_key=${{ env.ARM_ACCESS_KEY }}"
-      - name: Terraform Plan
-        run: terraform plan -var-file=$GITHUB_WORKSPACE/terraform/environments/non-pd.tfvars
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file=../../../terraform/environments/non-pd.tfvars
 
-#  build_and_push_image:
-#    needs: terraform
-#    if: github.event_name == 'push' && contains(github.event.commits[0].message, '[skip build]')
-#
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Set up Docker Buildx
-#        uses: docker/setup-buildx-action@v3.3.0
-#        with:
-#          buildkitd-config-inline: |
-#            [dns]
-#              nameservers=["8.8.8.8"]
-#      - name: Login to ACR
-#        uses: docker/login-action@v3.1.0
-#        with:
-#          registry: 'acrdvmvpem01acrgwc01.azurecr.io' #needs to be a parameter
-#          username: ${{ env.REGISTRY_USERNAME }}
-#          password: ${{ env.REGISTRY_PASSWORD }}
-#      - name: Unset DOCKER_HOST
-#        run: unset DOCKER_HOST
-#      - name: Build and push
-#        uses: docker/build-push-action@v5
-#        with:
-#          context: .
-#          file: ./docker/app/Dockerfile
-#          push: true
-#          tags: ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
-#
-#  deploy_to_aks:
-#    needs: terraform
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: List directory contents
-#        run: ls -la
-#      - name: Azure Login
-#        uses: azure/login@v1
-#        with:
-#          creds: '${{ secrets.AZURE_CREDENTIALS }}'
-#      - name: Set AKS context
-#        uses: azure/aks-set-context@v1
-#        with:
-#          creds: '${{ secrets.AZURE_CREDENTIALS }}'
-#          cluster-name: 'aks-dv-mvp-em01-aks-gwc-01' #needs to be a parameter
-#          resource-group: 'rg-dv-mvp-em01-aks-gwc-01' #needs to be a parameter
-#      - name: Deploy to AKS
-#        run: |
-#          kubectl apply -f ./k8s/deployment.yml
-#          kubectl apply -f ./k8s/service.yml
+      # Initialize Terraform with environment-specific backend
+      - name: Terraform Init
+        run: terraform init -backend-config="key=${{ env.BACKEND_KEY }}"
+
+      # Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ env.TFVARS_FILE }}
+
+      # Conditional Apply
+      - name: Require Approval for Production
+        if: ${{ env.ENVIRONMENT == 'prod' }}
+        run: |
+          echo "Production deployment requires approval."
+          echo "Manually approve in the GitHub Environment dashboard."
+
+      - name: Terraform Apply
+        if: ${{ env.ENVIRONMENT != 'prod' || github.event.environment_approved }}
+        run: terraform apply -auto-approve -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ env.TFVARS_FILE }}
