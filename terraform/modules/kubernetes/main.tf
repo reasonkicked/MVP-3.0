@@ -16,6 +16,16 @@ module "aks_resource_group" {
   location = var.location
 }
 
+data "terraform_remote_state" "network" {
+  backend = "azurerm"
+  config = {
+    resource_group_name  = "ts-rg-01"
+    storage_account_name = "mvp30backendsa"
+    container_name       = "terraform-states"
+    key                  = "${var.environment}-${var.application_instance}/network.tfstate" # Adjust for environment and instance
+  }
+}
+
 variable "environment" {
   type = string
 }
