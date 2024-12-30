@@ -25,8 +25,8 @@ jobs:
   deploy_network:
     uses: ./.github/workflows/network.yaml
     with:
-      environment: ${{ github.event.inputs.environment }}
-      application_instance: ${{ github.event.inputs.application_instance }}
+      environment: ${{ github.event.inputs.environment || 'dev' }}
+      application_instance: ${{ github.event.inputs.application_instance || 'em01' }}
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -34,8 +34,7 @@ jobs:
     needs: deploy_network
     uses: ./.github/workflows/kubernetes.yaml
     with:
-      environment: ${{ github.event.inputs.environment }}
-      application_instance: ${{ github.event.inputs.application_instance }}
+      environment: ${{ github.event.inputs.environment || 'dev' }}
+      application_instance: ${{ github.event.inputs.application_instance || 'em01' }}
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-
