@@ -16,6 +16,9 @@ on:
 jobs:
   terraform_kubernetes:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/modules/kubernetes/
     steps:
       - uses: actions/checkout@v2
 
