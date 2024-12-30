@@ -1,6 +1,12 @@
 name: Terraform Deployment
 
 on:
+  # Automatically trigger workflows for changes in feature/ or bugfix/ branches
+  push:
+    branches:
+      - 'feature/**'
+      - 'bugfix/**'
+  # Allow manual trigger for specific environments and instances
   workflow_dispatch:
     inputs:
       environment:
@@ -21,6 +27,8 @@ env:
 
 jobs:
   terraform:
+    # Restrict automatic deployments for protected branches
+    if: github.ref != 'refs/heads/master' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     defaults:
@@ -68,6 +76,7 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ env.TFVARS_FILE }}
 
+      # Require approval for production deployments
       - name: Require Approval for Production
         if: ${{ env.ENVIRONMENT == 'prod' }}
         run: |
