@@ -9,6 +9,9 @@ on:
       application_instance:
         required: true
         type: string
+    secrets:
+      AZURE_CREDENTIALS:
+        required: true
 
 jobs:
   terraform_kubernetes:
