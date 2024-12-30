@@ -34,5 +34,5 @@ jobs:
 
       - name: Terraform Init and Apply
         run: |
-          terraform init -backend-config="key=${{ inputs.environment }}-${{ inputs.application_instance }}/terraform.tfstate"
+          terraform init -backend-config="key=${{ inputs.environment }}-${{ inputs.application_instance }}/network.tfstate"
           terraform apply -auto-approve -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ inputs.environment }}-${{ inputs.application_instance }}.tfvars
