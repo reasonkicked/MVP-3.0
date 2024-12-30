@@ -21,70 +21,16 @@ permissions:
   contents: read
   id-token: write
 
-env:
-  IMAGE_NAME: 'mvp-3.0'
-
 jobs:
-  terraform_deployment:
-    runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
-    defaults:
-      run:
-        working-directory: 'terraform/modules/network/'
-    steps:
-      - uses: actions/checkout@v2
+  deploy_network:
+    uses: ./.github/workflows/network.yaml
+    with:
+      environment: ${{ github.event.inputs.environment }}
+      application_instance: ${{ github.event.inputs.application_instance }}
 
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: '${{ secrets.AZURE_CREDENTIALS }}'
-
-      - name: Set Terraform Authentication
-        run: |
-          echo "ARM_CLIENT_ID=$(jq -r '.clientId' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
-          echo "ARM_CLIENT_SECRET=$(jq -r '.clientSecret' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
-          echo "ARM_SUBSCRIPTION_ID=$(jq -r '.subscriptionId' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
-          echo "ARM_TENANT_ID=$(jq -r '.tenantId' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
-          echo "ARM_ACCESS_KEY=$(az storage account keys list --account-name mvp30backendsa --resource-group ts-rg-01 --query '[0].value' --output tsv)" >> $GITHUB_ENV
-
-
-      - name: Set Environment Variables
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
-            echo "APPLICATION_INSTANCE=${{ github.event.inputs.application_instance }}" >> $GITHUB_ENV
-          else
-            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
-            echo "APPLICATION_INSTANCE=em01" >> $GITHUB_ENV
-          fi
-
-      - name: Set TFVARS File Path
-        run: |
-          echo "TFVARS_FILE=${{ env.ENVIRONMENT }}-${{ env.APPLICATION_INSTANCE }}.tfvars" >> $GITHUB_ENV
-          echo "BACKEND_KEY=${{ env.ENVIRONMENT }}-${{ env.APPLICATION_INSTANCE }}/terraform.tfstate" >> $GITHUB_ENV
-
-      - name: Debug Environment Variables
-        run: |
-          echo "Event Name: ${{ github.event_name }}"
-          echo "Environment: ${{ env.ENVIRONMENT }}"
-          echo "Application Instance: ${{ env.APPLICATION_INSTANCE }}"
-          echo "Variables file: ${{ env.TFVARS_FILE }}"
-          echo "Backend key: ${{ env.BACKEND_KEY }}"
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Terraform Init
-        run: terraform init -backend-config="key=${{ env.BACKEND_KEY }}"
-
-      - name: Terraform Plan
-        run: terraform plan -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ env.TFVARS_FILE }}
-
-      - name: Require Approval for Production
-        if: ${{ env.ENVIRONMENT == 'prod' }}
-        run: |
-          echo "Production deployment requires approval."
-
-      - name: Terraform Apply
-        if: ${{ env.ENVIRONMENT != 'prod' || github.event.environment_approved }}
-        run: terraform apply -auto-approve -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ env.TFVARS_FILE }}
+  deploy_kubernetes:
+    needs: deploy_network
+    uses: ./.github/workflows/kubernetes.yaml
+    with:
+      environment: ${{ github.event.inputs.environment }}
+      application_instance: ${{ github.event.inputs.application_instance }}
