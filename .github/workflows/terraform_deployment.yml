@@ -3,6 +3,7 @@ name: Terraform Deployment
 on:
   push:
     branches:
+      - 'master'
       - 'feature/**'
       - 'bugfix/**'
   workflow_dispatch:
@@ -24,7 +25,7 @@ env:
   IMAGE_NAME: 'mvp-3.0'
 
 jobs:
-  terraform-deployment:
+  terraform_deployment:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     defaults:
