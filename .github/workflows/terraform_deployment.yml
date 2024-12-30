@@ -44,6 +44,8 @@ jobs:
           echo "ARM_CLIENT_SECRET=$(jq -r '.clientSecret' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=$(jq -r '.subscriptionId' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=$(jq -r '.tenantId' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
+          echo "ARM_ACCESS_KEY=$(az storage account keys list --account-name mvp30backendsa --resource-group ts-rg-01 --query '[0].value' --output tsv)" >> $GITHUB_ENV
+
 
       - name: Set Environment Variables
         run: |
