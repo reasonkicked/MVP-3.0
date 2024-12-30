@@ -140,6 +140,7 @@ jobs:
           echo "ARM_CLIENT_SECRET=$(jq -r '.clientSecret' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=$(jq -r '.subscriptionId' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=$(jq -r '.tenantId' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
+          echo "ARM_ACCESS_KEY=$(az storage account keys list --account-name mvp30backendsa --resource-group ts-rg-01 --query '[0].value' --output tsv)" >> $GITHUB_ENV
 
       - name: Set Environment Variables
         run: |
@@ -188,13 +189,12 @@ application_name      = "mvp"
 application_instance  = "em02"
 functions             = ["network", "aks", "acr"]
 resource_instance     = "01"
-#tooling_vnet_ip_range = "51.143.218.215"
 tooling_vnet_ip_range = "185.252.180.222"
 ```
 
 ## Best Practices
-- Use **feature branches** for development and **pull requests** for merging to `main`.
-- Protect `main` and `prod` deployments with review and approval workflows.
+- Use **feature branches** for development and **pull requests** for merging to `master`.
+- Protect `master` and `prod` deployments with review and approval workflows.
 - Modularize Terraform configurations for reusability.
 - Maintain separate `.tfvars` files for each environment and application instance.
 - Regularly rotate credentials stored in GitHub Secrets.
