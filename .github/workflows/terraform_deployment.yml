@@ -24,7 +24,7 @@ env:
   IMAGE_NAME: 'mvp-3.0'
 
 jobs:
-  terraform:
+  terraform-deployment:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     defaults:
