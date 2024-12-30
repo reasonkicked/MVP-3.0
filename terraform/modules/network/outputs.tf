@@ -1,5 +1,5 @@
 output "resource_group_name" {
-  value = azurerm_resource_group.network_resource_group.name
+  value = module.network_resource_group.name
 }
 
 output "public_subnet_id" {
