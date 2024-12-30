@@ -16,6 +16,9 @@ on:
 jobs:
   terraform_network:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/modules/network/
     steps:
       - uses: actions/checkout@v2
 
