@@ -7,6 +7,10 @@ on:
         description: "Environment to deploy (dev, qa, prod)"
         required: true
         default: "dev"
+      application_instance:
+        description: "Application instance (e.g., em01, em02)"
+        required: true
+        default: "em01"
 
 permissions:
   contents: read
@@ -41,13 +45,14 @@ jobs:
           echo "ARM_ACCESS_KEY=$(az storage account keys list --account-name mvp30backendsa --resource-group ts-rg-01 --query "[0].value" --output tsv)" >> $GITHUB_ENV
           echo "BACKEND_KEY=${{ github.event.inputs.environment }}/terraform.tfstate" >> $GITHUB_ENV
 
-
       # Set the environment-specific variables
       - name: Set Environment Variables
         run: |
           echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
           echo "TFVARS_FILE=${{ github.event.inputs.environment }}.tfvars" >> $GITHUB_ENV
           echo "BACKEND_KEY=${{ github.event.inputs.environment }}.tfstate" >> $GITHUB_ENV
+          echo "APPLICATION_INSTANCE=${{ github.event.inputs.application_instance }}" >> $GITHUB_ENV
+          echo "TFVARS_FILE=${{ github.event.inputs.environment }}-${{ env.APPLICATION_INSTANCE }}.tfvars" >> $GITHUB_ENV
 
       # Debug environment variables
       - name: Debug Environment Variables

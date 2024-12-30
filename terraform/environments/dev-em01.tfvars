@@ -1,7 +1,7 @@
 location              = "GermanyWestCentral"
 environment           = "dev"
 application_name      = "mvp"
-application_instance  = "em01"
+application_instance  = "em02"
 functions             = ["network", "aks", "acr"]
 resource_instance     = "01"
 #tooling_vnet_ip_range = "51.143.218.215"
