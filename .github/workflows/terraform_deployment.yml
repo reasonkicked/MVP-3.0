@@ -27,6 +27,8 @@ jobs:
     with:
       environment: ${{ github.event.inputs.environment }}
       application_instance: ${{ github.event.inputs.application_instance }}
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
   deploy_kubernetes:
     needs: deploy_network
@@ -34,3 +36,6 @@ jobs:
     with:
       environment: ${{ github.event.inputs.environment }}
       application_instance: ${{ github.event.inputs.application_instance }}
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
