@@ -38,3 +38,12 @@ jobs:
       application_instance: ${{ github.event.inputs.application_instance || 'em01' }}
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+  deploy_sql:
+    needs: deploy_network
+    uses: ./.github/workflows/sql.yaml
+    with:
+      environment: ${{ github.event.inputs.environment || 'dev' }}
+      application_instance: ${{ github.event.inputs.application_instance || 'em01' }}
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
