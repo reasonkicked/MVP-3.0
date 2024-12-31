@@ -9,6 +9,10 @@ on:
       application_instance:
         required: true
         type: string
+      require_apply_approval:
+        required: false
+        type: boolean
+        default: false
     secrets:
       AZURE_CREDENTIALS:
         required: true
@@ -35,8 +39,10 @@ jobs:
           echo "ARM_TENANT_ID=$(jq -r '.tenantId' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
           echo "ARM_ACCESS_KEY=$(az storage account keys list --account-name mvp30backendsa --resource-group ts-rg-01 --query '[0].value' --output tsv)" >> $GITHUB_ENV
 
-      - name: Terraform Init
-        run: terraform init -backend-config=$GITHUB_WORKSPACE/terraform/backends/backend-${{ inputs.environment }}-${{ inputs.application_instance }}-kubernetes.hcl -reconfigure
+      - name: Require Approval for Apply
+        if: ${{ inputs.require_apply_approval || inputs.environment == 'prod' }}
+        run: echo "Waiting for approval in the GitHub Environment dashboard."
 
       - name: Terraform Apply
+        if: ${{ !inputs.require_apply_approval || github.event.environment_approved }}
         run: terraform apply -auto-approve -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ inputs.environment }}-${{ inputs.application_instance }}-kubernetes.tfvars
