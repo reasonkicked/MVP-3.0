@@ -44,16 +44,16 @@ resource "azurerm_windows_virtual_machine" "vm" {
   vm_agent_platform_updates_enabled = true
 }
 
-resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown_schedule" {
-  virtual_machine_id = azurerm_windows_virtual_machine.vm.id
-  location           = var.location
-  enabled            = true
-
-  # Shutdown at 18:00 Polish time
-  daily_recurrence_time = "1800"
-  timezone              = "Central European Standard Time" # Polish time zone
-
-  notification_settings {
-    enabled = false # Set to true if you want notifications
-  }
-}
+# resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown_schedule" {
+#   virtual_machine_id = azurerm_windows_virtual_machine.vm.id
+#   location           = var.location
+#   enabled            = true
+#
+#   # Shutdown at 18:00 Polish time
+#   daily_recurrence_time = "1800"
+#   timezone              = "Central European Standard Time" # Polish time zone
+#
+#   notification_settings {
+#     enabled = false # Set to true if you want notifications
+#   }
+# }
