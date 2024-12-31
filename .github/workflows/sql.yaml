@@ -36,7 +36,7 @@ jobs:
           echo "ARM_ACCESS_KEY=$(az storage account keys list --account-name mvp30backendsa --resource-group ts-rg-01 --query '[0].value' --output tsv)" >> $GITHUB_ENV
 
       - name: Terraform Init
-        run: terraform init --backendconfig=$GITHUB_WORKSPACE/terraform/backends/backend-${{ inputs.environment }}-${{ inputs.application_instance }}-sql.hcl -reconfigure
+        run: terraform init -backend-config=$GITHUB_WORKSPACE/terraform/backends/backend-${{ inputs.environment }}-${{ inputs.application_instance }}-sql.hcl -reconfigure
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ inputs.environment }}-${{ inputs.application_instance }}-sql.tfvars
