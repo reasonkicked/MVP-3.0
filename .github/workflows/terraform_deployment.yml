@@ -14,6 +14,10 @@ on:
         description: "Application instance (e.g., em01, em02)"
         required: true
         default: "em01"
+      require_apply_approval:
+        description: "Require approval before applying changes (true/false)"
+        required: false
+        default: "false"
 
 permissions:
   contents: read
@@ -25,6 +29,7 @@ jobs:
     with:
       environment: ${{ github.event.inputs.environment || 'dev' }}
       application_instance: ${{ github.event.inputs.application_instance || 'em01' }}
+      require_apply_approval: ${{ github.event.inputs.require_apply_approval || 'false' }}
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -34,6 +39,7 @@ jobs:
     with:
       environment: ${{ github.event.inputs.environment || 'dev' }}
       application_instance: ${{ github.event.inputs.application_instance || 'em01' }}
+      require_apply_approval: ${{ github.event.inputs.require_apply_approval || 'false' }}
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
