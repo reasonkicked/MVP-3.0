@@ -11,8 +11,8 @@ on:
         type: string
       require_apply_approval:
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: "false"
     secrets:
       AZURE_CREDENTIALS:
         required: true
