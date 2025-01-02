@@ -18,8 +18,8 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
-resource "azurerm_linux_virtual_machine" "vm" {
-  name                = "ManagementVM"
+resource "azurerm_linux_virtual_machine" "management_vm" {
+  name                = "management-vm"
   resource_group_name = module.aks_resource_group.name
   location            = var.location
   size                = "Standard_B2s"
@@ -30,8 +30,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
     username   = "adminuser"
     public_key = data.azurerm_key_vault_secret.key_vault_id_rsa.value
   }
-
-  custom_data = file("${path.module}/scripts/kubernetes-vm.sh")
 
   network_interface_ids = [
     azurerm_network_interface.nic.id,
@@ -51,6 +49,26 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   disable_password_authentication = true
   allow_extension_operations      = true
+}
+
+resource "azurerm_virtual_machine_extension" "install_k8s" {
+  name                 = "k8s-setup"
+  virtual_machine_id   = azurerm_linux_virtual_machine.management_vm.id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.1"
+
+  settings = <<SETTINGS
+  {
+    "commandToExecute": "bash /var/lib/cloud/instance/scripts/kubernetes-vm.sh"
+  }
+  SETTINGS
+
+  protected_settings = <<PROTECTED_SETTINGS
+  {
+    "script": "${file("${path.module}/scripts/kubernetes-vm.sh")}"
+  }
+  PROTECTED_SETTINGS
 }
 
 
