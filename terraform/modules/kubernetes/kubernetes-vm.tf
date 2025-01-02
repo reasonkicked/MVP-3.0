@@ -8,7 +8,7 @@ resource "azurerm_public_ip" "public_ip" {
 resource "azurerm_network_interface" "nic" {
   name                = module.conventions.names.aks.network_interface
   location            = var.location
-  resource_group_name = data.terraform_remote_state.network.outputs.resource_group_name
+  resource_group_name = module.aks_resource_group.name
 
   ip_configuration {
     name                          = module.conventions.names.aks.network_interface
@@ -65,7 +65,7 @@ resource "azurerm_virtual_machine_extension" "install_k8s" {
   SETTINGS
 
   protected_settings = jsonencode({
-    "script": filebase64("${path.module}/scripts/kubernetes-vm.sh")
+    "script" : filebase64("${path.module}/scripts/kubernetes-vm.sh")
   })
 }
 
