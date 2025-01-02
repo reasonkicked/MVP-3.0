@@ -26,48 +26,28 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Update package list to include Docker's repository
-sudo apt-get update -y
+apt-get update -y
 
 # Install Docker CE
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+apt-get install -y docker-ce docker-ce-cli containerd.io
 
 # Enable and start Docker
-sudo systemctl enable docker
-sudo systemctl start docker
+systemctl enable docker
+systemctl start docker
 #
 # Install kubeadm, kubelet, and kubectl
 
 # Update system and install prerequisites
 
-sudo apt-get update -y
+apt-get update -y
 
-sudo apt-get install -y apt-transport-https curl gnupg lsb-release software-properties-common
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
+apt update
 
-# Add Kubernetes APT repository
-
-sudo mkdir -p /etc/apt/keyrings
-
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /etc/apt/keyrings/kubernetes-archive-keyring.gpg > /dev/null
-
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-
-
-# Update package list and install Kubernetes components
-
-sudo apt-get update -y
-
-sudo apt-get install -y kubelet kubeadm kubectl
-
-
-
-# Hold packages to prevent unintended upgrades
-
-sudo apt-mark hold kubelet kubeadm kubectl
-
-
+apt install -y kubeadm=1.28.1-1.1 kubelet=1.28.1-1.1 kubectl=1.28.1-1.1
 
 echo "Kubernetes setup completed successfully."
 
