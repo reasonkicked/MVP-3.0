@@ -31,6 +31,8 @@ resource "azurerm_linux_virtual_machine" "vm" {
     public_key = data.azurerm_key_vault_secret.key_vault_id_rsa.value
   }
 
+  custom_data = file("${path.module}/scripts/kubernetes-vm.sh")
+
   network_interface_ids = [
     azurerm_network_interface.nic.id,
   ]
