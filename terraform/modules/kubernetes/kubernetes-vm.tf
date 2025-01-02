@@ -64,10 +64,13 @@ resource "azurerm_virtual_machine_extension" "install_k8s" {
   }
   SETTINGS
 
-  protected_settings = jsonencode({
-    "script" : filebase64("${path.module}/scripts/kubernetes-vm.sh")
-  })
+  protected_settings = <<PROTECTED_SETTINGS
+  {
+    "script": "${base64encode(file("${path.module}/scripts/kubernetes-vm.sh"))}"
+  }
+  PROTECTED_SETTINGS
 }
+
 
 resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown_schedule" {
   virtual_machine_id = azurerm_linux_virtual_machine.management_vm.id
