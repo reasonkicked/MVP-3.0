@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Environment to deploy (dev, qa, prod)"
+        description: "Environment to deploy (dev, qa, pd)"
         required: true
         default: "dev"
       application_instance:
