@@ -18,13 +18,19 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
-resource "azurerm_windows_virtual_machine" "vm" {
+resource "azurerm_linux_virtual_machine" "vm" {
   name                = "ManagementVM"
   resource_group_name = module.aks_resource_group.name
   location            = var.location
-  size                = "Standard_DS1_v2"
+  size                = "Standard_B2s"
   admin_username      = "adminuser"
-  admin_password      = data.azurerm_key_vault_secret.key_vault_secret.value
+
+  # Use SSH for authentication
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = data.azurerm_key_vault_secret.key_vault_id_rsa.value
+  }
+
   network_interface_ids = [
     azurerm_network_interface.nic.id,
   ]
@@ -35,17 +41,19 @@ resource "azurerm_windows_virtual_machine" "vm" {
   }
 
   source_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2019-Datacenter"
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "20_04-lts"
     version   = "latest"
   }
 
-  vm_agent_platform_updates_enabled = true
+  disable_password_authentication = true
+  allow_extension_operations      = true
 }
 
+
 resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown_schedule" {
-  virtual_machine_id = azurerm_windows_virtual_machine.vm.id
+  virtual_machine_id = azurerm_linux_virtual_machine.vm.id
   location           = var.location
   enabled            = true
 
