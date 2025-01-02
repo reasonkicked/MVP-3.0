@@ -21,6 +21,7 @@ permissions:
 
 jobs:
   deploy_network:
+    if: "!contains(github.event.head_commit.message, '[skip-network]')"
     uses: ./.github/workflows/network.yaml
     with:
       environment: ${{ github.event.inputs.environment || 'dev' }}
@@ -30,6 +31,7 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
   deploy_kubernetes:
+    if: "!contains(github.event.head_commit.message, '[skip-kubernetes]')"
     needs: deploy_network
     uses: ./.github/workflows/kubernetes.yaml
     with:
@@ -40,6 +42,7 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
   deploy_sql:
+    if: "!contains(github.event.head_commit.message, '[skip-sql]')"
     needs: deploy_network
     uses: ./.github/workflows/sql.yaml
     with:
