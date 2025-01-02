@@ -58,12 +58,6 @@ resource "azurerm_virtual_machine_extension" "install_k8s" {
   type                 = "CustomScript"
   type_handler_version = "2.1"
 
-  settings = <<SETTINGS
-  {
-    "commandToExecute": "bash /var/lib/cloud/instance/scripts/kubernetes-vm.sh"
-  }
-  SETTINGS
-
   protected_settings = <<PROTECTED_SETTINGS
   {
     "script": "${base64encode(file("${path.module}/scripts/kubernetes-vm.sh"))}"
