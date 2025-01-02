@@ -53,7 +53,7 @@ resource "azurerm_linux_virtual_machine" "management_vm" {
 
 resource "azurerm_virtual_machine_extension" "install_k8s" {
   name                 = "k8s-setup"
-  virtual_machine_id   = azurerm_linux_virtual_machine.vm.id
+  virtual_machine_id   = azurerm_linux_virtual_machine.management_vm.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
   type_handler_version = "2.1"
