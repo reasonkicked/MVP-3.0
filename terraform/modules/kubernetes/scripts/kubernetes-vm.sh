@@ -36,23 +36,38 @@ sudo systemctl enable docker
 sudo systemctl start docker
 #
 # Install kubeadm, kubelet, and kubectl
-echo "Starting Kubernetes setup on Ubuntu 22.04 (Jammy)..."
 
-# Update system
+# Update system and install prerequisites
+
 sudo apt-get update -y
+
 sudo apt-get install -y apt-transport-https curl gnupg lsb-release software-properties-common
 
-# Add Kubernetes APT repository
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /etc/apt/keyrings/kubernetes-archive-keyring.gpg > /dev/null
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-jammy main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-# Update package list and install Kubernetes
+
+# Add Kubernetes APT repository
+
+sudo mkdir -p /etc/apt/keyrings
+
+curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /etc/apt/keyrings/kubernetes-archive-keyring.gpg > /dev/null
+
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+
+
+# Update package list and install Kubernetes components
+
 sudo apt-get update -y
+
 sudo apt-get install -y kubelet kubeadm kubectl
 
+
+
 # Hold packages to prevent unintended upgrades
+
 sudo apt-mark hold kubelet kubeadm kubectl
+
+
 
 echo "Kubernetes setup completed successfully."
 
