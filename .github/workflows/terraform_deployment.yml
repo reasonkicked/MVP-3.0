@@ -14,10 +14,6 @@ on:
         description: "Application instance (e.g., em01, em02)"
         required: true
         default: "em01"
-      require_apply_approval:
-        description: "Require approval before applying changes (true/false)"
-        required: false
-        default: "false"
 
 permissions:
   contents: read

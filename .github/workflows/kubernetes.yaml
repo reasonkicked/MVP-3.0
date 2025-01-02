@@ -9,10 +9,6 @@ on:
       application_instance:
         required: true
         type: string
-      require_apply_approval:
-        required: false
-        type: string
-        default: "false"
     secrets:
       AZURE_CREDENTIALS:
         required: true
@@ -45,10 +41,5 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -out=plan.out -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ inputs.environment }}-${{ inputs.application_instance }}-kubernetes.tfvars
 
-      - name: Require Approval for Apply
-        if: ${{ inputs.require_apply_approval == 'true' || inputs.environment == 'prod' }}
-        run: echo "Waiting for approval in the GitHub Environment dashboard."
-
       - name: Terraform Apply
-        if: ${{ inputs.require_apply_approval != 'true' || github.event.environment_approved }}
         run: terraform apply plan.out
