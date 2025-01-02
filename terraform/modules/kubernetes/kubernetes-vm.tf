@@ -53,7 +53,7 @@ resource "azurerm_linux_virtual_machine" "management_vm" {
 
 resource "azurerm_virtual_machine_extension" "install_k8s" {
   name                 = "k8s-setup"
-  virtual_machine_id   = azurerm_linux_virtual_machine.management_vm.id
+  virtual_machine_id   = azurerm_linux_virtual_machine.vm.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
   type_handler_version = "2.1"
@@ -64,16 +64,13 @@ resource "azurerm_virtual_machine_extension" "install_k8s" {
   }
   SETTINGS
 
-  protected_settings = <<PROTECTED_SETTINGS
-  {
-    "script": "${file("${path.module}/scripts/kubernetes-vm.sh")}"
-  }
-  PROTECTED_SETTINGS
+  protected_settings = jsonencode({
+    "script": filebase64("${path.module}/scripts/kubernetes-vm.sh")
+  })
 }
 
-
 resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown_schedule" {
-  virtual_machine_id = azurerm_linux_virtual_machine.vm.id
+  virtual_machine_id = azurerm_linux_virtual_machine.management_vm.id
   location           = var.location
   enabled            = true
 
