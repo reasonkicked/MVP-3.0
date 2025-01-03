@@ -61,11 +61,6 @@ sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-relea
 echo "Verifying package installation..."
 dpkg -l | grep -E "apt-transport-https|ca-certificates|curl|gnupg|lsb-release" || { echo "One or more prerequisites failed to install"; exit 1; }
 
-systemctl restart irqbalance.service
-systemctl restart polkit.service
-systemctl restart walinuxagent.service
-
-
 # Add Docker's official GPG key and set up repository
 echo "Installing Docker GPG key and setting up repository..."
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
