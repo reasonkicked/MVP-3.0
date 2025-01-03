@@ -1,66 +1,48 @@
 #!/bin/bash
+
 set -e
 
-# Redirect stdout and stderr to a log file
-exec > >(tee -a /var/log/k8s-setup.log) 2>&1
+# Update and install dependencies
+sudo apt-get update -y
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 
-echo "Starting Kubernetes setup..."
+# Add Docker's official GPG key and repository
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Update and install prerequisites
-apt-get update -y
-apt-get upgrade -y
-apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+# Install Docker
+sudo apt-get update -y
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+sudo systemctl enable docker
+sudo systemctl start docker
 
-## Install Docker
-apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    software-properties-common
+# Add Kubernetes GPG key and repository
+curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-# Add Docker’s official GPG key
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+# Install Kubernetes tools
+sudo apt-get update -y
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
 
-# Set up the Docker stable repository
-echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-# Update package list to include Docker's repository
-apt-get update -y
-
-# Install Docker CE
-apt-get install -y docker-ce docker-ce-cli containerd.io
-
-# Enable and start Docker
-systemctl enable docker
-systemctl start docker
-#
-# Install kubeadm, kubelet, and kubectl
-
-# Update system and install prerequisites
-
-apt-get update -y
-
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-apt update
-
-apt install -y kubeadm=1.28.1-1.1 kubelet=1.28.1-1.1 kubectl=1.28.1-1.1
-
-echo "Kubernetes setup completed successfully."
+# Disable swap (required by Kubernetes)
+sudo swapoff -a
+sudo sed -i '/ swap / s/^/#/' /etc/fstab
 
 # Initialize Kubernetes cluster
-kubeadm init --pod-network-cidr=192.168.0.0/16
-#
-## Set up kubectl for the admin user
-#mkdir -p /home/adminuser/.kube
-#cp -i /etc/kubernetes/admin.conf /home/adminuser/.kube/config
-#chown adminuser:adminuser /home/adminuser/.kube/config
-#
-## Install a pod network (e.g., Calico)
-#su - adminuser -c "kubectl apply -f https://docs.projectcalico.org/v3.25/manifests/calico.yaml"
-#
-## Allow scheduling pods on the control plane node
-#su - adminuser -c "kubectl taint nodes --all node-role.kubernetes.io/control-plane-"
+sudo kubeadm init --pod-network-cidr=192.168.0.0/16
+
+# Set up kubeconfig for the admin user
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# Install a pod network (Calico)
+kubectl apply -f https://docs.projectcalico.org/v3.25/manifests/calico.yaml
+
+# Allow scheduling pods on the master node (optional, if single-node cluster)
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+kubectl taint nodes --all node-role.kubernetes.io/master-
+
+# Output cluster information
+echo "Kubernetes installation is complete. Use 'kubectl get nodes' to check node status."
