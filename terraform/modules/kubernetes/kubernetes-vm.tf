@@ -60,7 +60,7 @@ resource "azurerm_virtual_machine_extension" "install_k8s" {
 
   protected_settings = <<PROTECTED_SETTINGS
   {
-    "script": "${base64encode(file("${path.module}/scripts/kubernetes-vm-temp.sh"))}"
+    "script": "${base64encode(file("${path.module}/scripts/kubernetes-vm-temp-2.sh"))}"
   }
   PROTECTED_SETTINGS
 }
