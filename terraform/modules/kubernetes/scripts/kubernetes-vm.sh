@@ -4,6 +4,9 @@ exec > >(tee -a /var/log/k8s-setup.log) 2>&1
 # Exit script on any error
 set -e
 
+# Set noninteractive frontend for debconf
+export DEBIAN_FRONTEND=noninteractive
+
 # Debug information
 echo "Running as user: $(whoami)"
 echo "Hostname: $(hostname)"
