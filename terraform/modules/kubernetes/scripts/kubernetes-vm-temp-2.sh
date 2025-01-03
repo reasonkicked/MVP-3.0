@@ -72,6 +72,32 @@ CONTROL_PLANE_IP=$(hostname -I | awk '{print $1}')
 echo "Initializing Kubernetes control plane..."
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${CONTROL_PLANE_IP}
 
+# Wait for control plane to stabilize
+echo "Waiting for control plane to stabilize..."
+sleep 30
+
+# Verify API server health
+echo "Checking API server health..."
+for i in {1..40}; do
+    if kubectl get --raw='/healthz' &>/dev/null; then
+        echo "API server is healthy."
+        break
+    fi
+    echo "API server not ready, retrying in 5 seconds... ($i/40)"
+    sleep 5
+done
+
+if ! kubectl get --raw='/healthz' &>/dev/null; then
+    echo "API server did not become ready in time."
+    exit 1
+fi
+
+# Deploy CoreDNS manually if kubeadm fails
+if ! kubectl get pods -n kube-system | grep -q coredns; then
+    echo "CoreDNS not deployed successfully, attempting manual deployment..."
+    kubectl apply -f /etc/kubernetes/addons/core-dns.yaml || echo "Manual CoreDNS deployment failed!"
+fi
+
 # Configure kubectl for the current user
 echo "Setting up kubectl for the current user..."
 mkdir -p $HOME/.kube
@@ -93,6 +119,7 @@ if ! kubectl get --raw='/healthz' &>/dev/null; then
     echo "API server did not become ready in time."
     exit 1
 fi
+kubectl get pods
 
 # Create role binding for kube-scheduler
 echo "Creating role binding for kube-scheduler..."
