@@ -65,17 +65,23 @@ dpkg -l | grep -E "apt-transport-https|ca-certificates|curl|gnupg|lsb-release" |
 echo "Installing Docker GPG key and setting up repository..."
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
 # Install and configure containerd
 echo "Installing and configuring containerd..."
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update
 sudo apt-get install -y containerd.io || { echo "Failed to install containerd.io"; exit 1; }
 
-# Verify installation
-if ! dpkg -l | grep -q containerd.io; then
-    echo "containerd.io installation failed!"
-    exit 1
+# Handle kernel upgrade notifications
+if sudo needrestart -r | grep -q "kernel"; then
+    echo "Pending kernel upgrade detected. You should consider rebooting the system."
+    sudo needrestart -r
+fi
+
+# Handle deferred service restarts
+if sudo needrestart -l | grep -q "restart"; then
+    echo "Services need restarting. Restarting deferred services..."
+    sudo systemctl daemon-reexec
+    sudo needrestart -r || true
 fi
 
 # Configure containerd
@@ -85,16 +91,22 @@ sudo containerd config default | sudo tee /etc/containerd/config.toml > /dev/nul
 
 # Restart and enable containerd
 echo "Restarting and enabling containerd..."
-sudo systemctl restart containerd
+sudo systemctl restart containerd || { echo "Failed to restart containerd"; sudo systemctl status containerd --no-pager; exit 1; }
 sudo systemctl enable containerd
 
 # Verify containerd status
+echo "Verifying containerd status..."
 if ! sudo systemctl is-active --quiet containerd; then
     echo "Containerd service is not active!"
     sudo systemctl status containerd --no-pager
     exit 1
+else
+    echo "Containerd service is active and running."
 fi
-echo "Containerd installation and configuration completed successfully."
+
+# Debug containerd logs if needed
+echo "Containerd logs:"
+sudo journalctl -u containerd --no-pager -n 20
 #
 ## Add Kubernetes repository and install kubeadm, kubelet, kubectl
 #echo "Setting up Kubernetes repository and installing tools..."
