@@ -13,4 +13,5 @@ sudo apt upgrade -y
 #
 #sudo systemctl enable docker
 #sudo systemctl status docker
-
+sudo swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
