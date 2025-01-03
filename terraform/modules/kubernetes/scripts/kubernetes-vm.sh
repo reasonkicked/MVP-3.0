@@ -1,6 +1,10 @@
 #!/bin/bash
 
 set -e
+# Redirect stdout and stderr to a log file
+exec > >(tee -a /var/log/k8s-setup.log) 2>&1
+
+echo "Starting Kubernetes setup..."
 
 # Update and install dependencies
 sudo apt-get update -y
