@@ -65,23 +65,31 @@ dpkg -l | grep -E "apt-transport-https|ca-certificates|curl|gnupg|lsb-release" |
 echo "Installing Docker GPG key and setting up repository..."
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Add Docker's official GPG key and set up repository
+echo "Installing Docker GPG key and setting up repository..."
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
 # Install and configure containerd
 echo "Installing and configuring containerd..."
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update
 sudo apt-get install -y containerd.io || { echo "Failed to install containerd.io"; exit 1; }
 
-# Handle kernel upgrade notifications
-if sudo needrestart -r | grep -q "kernel"; then
-    echo "Pending kernel upgrade detected. You should consider rebooting the system."
-    sudo needrestart -r
+# Check for kernel upgrade
+echo "Checking for pending kernel upgrades..."
+if needrestart -k | grep -q "obsolete kernel"; then
+    echo "Pending kernel upgrade detected. Rebooting the system is required."
+    echo "Reboot the system and re-run the script to complete the setup."
+    exit 1
 fi
 
 # Handle deferred service restarts
-if sudo needrestart -l | grep -q "restart"; then
-    echo "Services need restarting. Restarting deferred services..."
-    sudo systemctl daemon-reexec
-    sudo needrestart -r || true
+echo "Checking for deferred service restarts..."
+if needrestart -l | grep -q "restart"; then
+    echo "Restarting deferred services..."
+    sudo needrestart -r a || true
 fi
 
 # Configure containerd
@@ -107,6 +115,8 @@ fi
 # Debug containerd logs if needed
 echo "Containerd logs:"
 sudo journalctl -u containerd --no-pager -n 20
+
+
 #
 ## Add Kubernetes repository and install kubeadm, kubelet, kubectl
 #echo "Setting up Kubernetes repository and installing tools..."
