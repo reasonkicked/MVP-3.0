@@ -42,8 +42,24 @@ sudo sysctl --system
 
 # Update system and install prerequisites
 echo "Updating system and installing prerequisites..."
+export DEBIAN_FRONTEND=noninteractive
+
+# Resolve any pending upgrades
+echo "Resolving pending upgrades..."
 sudo apt-get update
+sudo apt-get dist-upgrade -y || { echo "Failed to complete dist-upgrade"; exit 1; }
+
+# Pre-configure packages to avoid interactive prompts
+sudo apt-get install -y debconf-utils
+echo "libcurl3-gnutls libraries/restart-without-asking boolean true" | sudo debconf-set-selections
+
+# Install required packages
+echo "Installing required packages..."
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release || { echo "Failed to install prerequisites"; exit 1; }
+
+# Verify installation status
+echo "Verifying package installation..."
+dpkg -l | grep -E "apt-transport-https|ca-certificates|curl|gnupg|lsb-release" || { echo "One or more prerequisites failed to install"; exit 1; }
 
 # Add Docker's official GPG key
 echo "Installing Docker GPG key and setting up repository..."
