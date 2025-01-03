@@ -60,20 +60,46 @@ sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-relea
 # Verify installation status
 echo "Verifying package installation..."
 dpkg -l | grep -E "apt-transport-https|ca-certificates|curl|gnupg|lsb-release" || { echo "One or more prerequisites failed to install"; exit 1; }
-#
-## Add Docker's official GPG key
-#echo "Installing Docker GPG key and setting up repository..."
-#curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-#echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-#
-## Install and configure containerd
-#echo "Installing and configuring containerd..."
-#sudo apt-get update
-#sudo apt-get install -y containerd.io || { echo "Failed to install containerd.io"; exit 1; }
-#sudo containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
-#sudo systemctl restart containerd
-#sudo systemctl enable containerd
-#sudo systemctl status containerd --no-pager
+
+systemctl restart irqbalance.service
+systemctl restart polkit.service
+systemctl restart walinuxagent.service
+
+
+# Add Docker's official GPG key and set up repository
+echo "Installing Docker GPG key and setting up repository..."
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install and configure containerd
+echo "Installing and configuring containerd..."
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update
+sudo apt-get install -y containerd.io || { echo "Failed to install containerd.io"; exit 1; }
+
+# Verify installation
+if ! dpkg -l | grep -q containerd.io; then
+    echo "containerd.io installation failed!"
+    exit 1
+fi
+
+# Configure containerd
+echo "Configuring containerd..."
+sudo mkdir -p /etc/containerd
+sudo containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
+
+# Restart and enable containerd
+echo "Restarting and enabling containerd..."
+sudo systemctl restart containerd
+sudo systemctl enable containerd
+
+# Verify containerd status
+if ! sudo systemctl is-active --quiet containerd; then
+    echo "Containerd service is not active!"
+    sudo systemctl status containerd --no-pager
+    exit 1
+fi
+echo "Containerd installation and configuration completed successfully."
 #
 ## Add Kubernetes repository and install kubeadm, kubelet, kubectl
 #echo "Setting up Kubernetes repository and installing tools..."
