@@ -14,8 +14,8 @@ module "jumpbox" {
 
   source_image_reference = {
     publisher = "Debian"
-    offer     = "debian-12-arm64"
-    sku       = "12-arm64-gen2"
+    offer     = "debian-12"
+    sku       = "12-arm64"
     version   = "latest"
   }
 
