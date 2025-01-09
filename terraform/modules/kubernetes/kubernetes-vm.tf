@@ -18,7 +18,6 @@ module "jumpbox" {
     sku       = "12-arm64"
     version   = "latest"
   }
-
 }
 
 module "server" {
