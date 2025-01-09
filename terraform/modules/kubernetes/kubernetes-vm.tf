@@ -41,9 +41,9 @@ resource "azurerm_linux_virtual_machine" "management_vm" {
   }
 
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
+    publisher = "Debian"
+    offer     = "debian-12"
+    sku       = "12-gen2"
     version   = "latest"
   }
 
@@ -65,6 +65,20 @@ resource "azurerm_virtual_machine_extension" "install_k8s" {
   PROTECTED_SETTINGS
 }
 
+module "jumpbox" {
+  source              = "../../modules/bits/vm"
+  vm_name             = "${module.conventions.aks.vm}-jumpbox"
+  location            = var.location
+  resource_group_name = module.aks_resource_group.name
+  subnet_id           = data.terraform_remote_state.network.outputs.public_subnet_id
+  vm_size             = "Standard_B2s"
+  admin_username      = "adminuser"
+  ssh_public_key      = data.azurerm_key_vault_secret.key_vault_id_rsa.value
+  public_ip_enabled   = true
+  script_path         = "${path.module}/scripts/jumpbox-setup.sh"
+  shutdown_time       = "1800"
+  timezone            = "Central European Standard Time"
+}
 
 resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown_schedule" {
   virtual_machine_id = azurerm_linux_virtual_machine.management_vm.id
