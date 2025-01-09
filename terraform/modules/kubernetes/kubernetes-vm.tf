@@ -8,7 +8,7 @@ module "jumpbox" {
   admin_username      = "adminuser"
   ssh_public_key      = data.azurerm_key_vault_secret.key_vault_id_rsa.value
   public_ip_enabled   = true
-  script_path         = "${path.module}/scripts/jumpbox-setup.sh"
+  script_path         = "${path.module}/scripts/vm-jumpbox-setup.sh"
   shutdown_time       = "1800"
   timezone            = "Central European Standard Time"
 }
