@@ -4,7 +4,7 @@ module "jumpbox" {
   location            = var.location
   resource_group_name = module.aks_resource_group.name
   subnet_id           = data.terraform_remote_state.network.outputs.public_subnet_id
-  vm_size             = "Standard_B2s"
+  vm_size             = "Standard_D2ps_v5"
   admin_username      = "adminuser"
   ssh_public_key      = data.azurerm_key_vault_secret.key_vault_id_rsa.value
   public_ip_enabled   = true
