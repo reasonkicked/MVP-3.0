@@ -41,10 +41,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 
   source_image_reference {
-    publisher = "Debian"
-    offer     = "debian-12"
-    sku       = "12-gen2"
-    version   = "latest"
+    publisher = var.source_image_reference.publisher
+    offer     = var.source_image_reference.offer
+    sku       = var.source_image_reference.sku
+    version   = var.source_image_reference.version
   }
 
   disable_password_authentication = true

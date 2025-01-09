@@ -61,3 +61,13 @@ variable "notification_enabled" {
   type        = bool
   default     = false
 }
+
+variable "source_image_reference" {
+  description = "The source image reference for the VM"
+  type = object({
+    publisher = string
+    offer     = string
+    sku       = string
+    version   = string
+  })
+}

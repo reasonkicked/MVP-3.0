@@ -11,4 +11,12 @@ module "jumpbox" {
   script_path         = "${path.module}/scripts/vm-jumpbox-setup.sh"
   shutdown_time       = "1800"
   timezone            = "Central European Standard Time"
+
+  source_image_reference = {
+    publisher = "Debian"
+    offer     = "debian-12-arm64"
+    sku       = "12-arm64-gen2"
+    version   = "latest"
+  }
+
 }
