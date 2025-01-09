@@ -67,7 +67,7 @@ resource "azurerm_virtual_machine_extension" "install_k8s" {
 
 module "jumpbox" {
   source              = "../../modules/bits/vm"
-  vm_name             = "${module.conventions.names.aks.vm}-jumpbox"
+  vm_name             = "${module.conventions.names.aks.virtual_machine}-jumpbox"
   location            = var.location
   resource_group_name = module.aks_resource_group.name
   subnet_id           = data.terraform_remote_state.network.outputs.public_subnet_id
