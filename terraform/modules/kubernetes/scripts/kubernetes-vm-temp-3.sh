@@ -56,11 +56,31 @@ mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-# Step 9: Deploy a pod network (Flannel)
-echo "Deploying Flannel CNI..."
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --validate=false
+# Step 9: Wait for API server readiness
+echo "Waiting for API server to become ready..."
+for i in {1..40}; do
+    if kubectl get --raw='/healthz' &>/dev/null; then
+        echo "API server is healthy."
+        break
+    fi
+    echo "API server not ready, retrying in 5 seconds... ($i/40)"
+    sleep 5
+done
 
-# Step 10: Verify cluster setup
+if ! kubectl get --raw='/healthz' &>/dev/null; then
+    echo "API server did not become ready in time. Exiting."
+    exit 1
+fi
+
+# Step 10: Deploy a pod network (Flannel)
+echo "Deploying Flannel CNI..."
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --validate=false || {
+    echo "Failed to deploy Flannel CNI. Retrying..."
+    sleep 10
+    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --validate=false
+}
+
+# Step 11: Verify cluster setup
 echo "Verifying Kubernetes setup..."
 kubectl get nodes
 kubectl get pods -A
