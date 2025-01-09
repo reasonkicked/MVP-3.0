@@ -6,6 +6,8 @@ set -e
 
 uname -mov
 
+apt-get upgrade
+apt-get update
 apt-get -y install wget curl vim openssl git
 
 git clone --depth 1 \
