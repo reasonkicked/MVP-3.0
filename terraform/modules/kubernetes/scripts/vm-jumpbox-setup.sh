@@ -35,3 +35,16 @@ ls -loh downloads
 }
 
 kubectl version --client
+
+# Verify kubectl version
+echo "Verifying kubectl installation..."
+if kubectl version --client; then
+  echo "kubectl is successfully installed and verified."
+else
+  echo "Failed to verify kubectl installation. Please check logs."
+  exit 1
+fi
+
+# Final result for pipeline visibility
+echo "Script completed. Final verification:"
+kubectl version --client || echo "kubectl verification failed in pipeline output."
