@@ -57,8 +57,8 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 # Step 9: Deploy a pod network (Flannel)
-echo "Deploying Flannel network..."
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+echo "Deploying Flannel CNI..."
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml --validate=false
 
 # Step 10: Verify cluster setup
 echo "Verifying Kubernetes setup..."
