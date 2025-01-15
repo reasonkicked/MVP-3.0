@@ -1,5 +1,5 @@
 location             = "GermanyWestCentral"
-environment          = "dev"
+environment          = "pd"
 application_name     = "mvp"
 application_instance = "em01"
 functions            = ["network", "aks", "acr"]

@@ -1,59 +1,90 @@
-resource "azurerm_public_ip" "public_ip" {
-  name                = module.conventions.names.aks.public_ip
+module "jumpbox" {
+  source              = "../../modules/bits/vm"
+  vm_name             = "${module.conventions.names.aks.virtual_machine}-jumpbox"
   location            = var.location
-  resource_group_name = data.terraform_remote_state.network.outputs.resource_group_name
-  allocation_method   = "Static"
-}
-
-resource "azurerm_network_interface" "nic" {
-  name                = module.conventions.names.aks.network_interface
-  location            = var.location
-  resource_group_name = data.terraform_remote_state.network.outputs.resource_group_name
-
-  ip_configuration {
-    name                          = module.conventions.names.aks.network_interface
-    subnet_id                     = data.terraform_remote_state.network.outputs.public_subnet_id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.public_ip.id
-  }
-}
-
-resource "azurerm_windows_virtual_machine" "vm" {
-  name                = "ManagementVM"
-  resource_group_name = data.terraform_remote_state.network.outputs.resource_group_name
-  location            = var.location
-  size                = "Standard_DS1_v2"
+  resource_group_name = module.aks_resource_group.name
+  subnet_id           = data.terraform_remote_state.network.outputs.public_subnet_id
+  vm_size             = "Standard_D2ps_v5"
   admin_username      = "adminuser"
-  admin_password      = data.azurerm_key_vault_secret.key_vault_secret.value
-  network_interface_ids = [
-    azurerm_network_interface.nic.id,
-  ]
+  ssh_public_key      = data.azurerm_key_vault_secret.key_vault_id_rsa.value
+  public_ip_enabled   = true
+  script_path         = "${path.module}/scripts/vm-jumpbox-setup.sh"
+  shutdown_time       = "1800"
+  timezone            = "Central European Standard Time"
 
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+  source_image_reference = {
+    publisher = "Debian"
+    offer     = "debian-12"
+    sku       = "12-arm64"
+    version   = "latest"
   }
+}
 
-  source_image_reference {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2019-Datacenter"
+module "server" {
+  source              = "../../modules/bits/vm"
+  vm_name             = "${module.conventions.names.aks.virtual_machine}-server"
+  location            = var.location
+  resource_group_name = module.aks_resource_group.name
+  subnet_id           = data.terraform_remote_state.network.outputs.public_subnet_id
+  vm_size             = "Standard_D2ps_v5"
+  admin_username      = "adminuser"
+  ssh_public_key      = data.azurerm_key_vault_secret.key_vault_id_rsa.value
+  public_ip_enabled   = true
+  script_path         = "${path.module}/scripts/vm-server-setup.sh"
+  shutdown_time       = "1800"
+  timezone            = "Central European Standard Time"
+
+  source_image_reference = {
+    publisher = "Debian"
+    offer     = "debian-12"
+    sku       = "12-arm64"
     version   = "latest"
   }
 
-  vm_agent_platform_updates_enabled = true
 }
 
-resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown_schedule" {
-  virtual_machine_id = azurerm_windows_virtual_machine.vm.id
-  location           = var.location
-  enabled            = true
+module "node_0" {
+  source              = "../../modules/bits/vm"
+  vm_name             = "${module.conventions.names.aks.virtual_machine}-node-0"
+  location            = var.location
+  resource_group_name = module.aks_resource_group.name
+  subnet_id           = data.terraform_remote_state.network.outputs.public_subnet_id
+  vm_size             = "Standard_D2ps_v5"
+  admin_username      = "adminuser"
+  ssh_public_key      = data.azurerm_key_vault_secret.key_vault_id_rsa.value
+  public_ip_enabled   = true
+  script_path         = "${path.module}/scripts/vm-node-0-setup.sh"
+  shutdown_time       = "1800"
+  timezone            = "Central European Standard Time"
 
-  # Shutdown at 18:00 Polish time
-  daily_recurrence_time = "1800"
-  timezone              = "Central European Standard Time" # Polish time zone
-
-  notification_settings {
-    enabled = false # Set to true if you want notifications
+  source_image_reference = {
+    publisher = "Debian"
+    offer     = "debian-12"
+    sku       = "12-arm64"
+    version   = "latest"
   }
+
+}
+
+module "node_1" {
+  source              = "../../modules/bits/vm"
+  vm_name             = "${module.conventions.names.aks.virtual_machine}-node-1"
+  location            = var.location
+  resource_group_name = module.aks_resource_group.name
+  subnet_id           = data.terraform_remote_state.network.outputs.public_subnet_id
+  vm_size             = "Standard_D2ps_v5"
+  admin_username      = "adminuser"
+  ssh_public_key      = data.azurerm_key_vault_secret.key_vault_id_rsa.value
+  public_ip_enabled   = true
+  script_path         = "${path.module}/scripts/vm-node-1-setup.sh"
+  shutdown_time       = "1800"
+  timezone            = "Central European Standard Time"
+
+  source_image_reference = {
+    publisher = "Debian"
+    offer     = "debian-12"
+    sku       = "12-arm64"
+    version   = "latest"
+  }
+
 }

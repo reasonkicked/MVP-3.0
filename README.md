@@ -61,7 +61,7 @@ The deployment workflow is managed via the `terraform_deployment.yaml` file in t
   - Can be triggered manually via `workflow_dispatch` for specific environments and tenants.
 
 ### Key Features
-- Supports environment-specific deployments (`dev`, `qa`, `prod`).
+- Supports environment-specific deployments (`dev`, `qa`, `pd`).
 - Supports multi-tenant deployments via `application_instance` (e.g., `em01`, `em02`).
 - Enforces production approvals using GitHub Environments.
 

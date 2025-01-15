@@ -4,7 +4,7 @@ terraform {
   backend "azurerm" {
     storage_account_name = "mvp30backendsa"
     container_name       = "terraform-states"
-    key                  = "${var.environment}/terraform.tfstate"
+    key                  = "${var.environment}-${var.application_instance}/network.tfstate"
   }
 
   required_providers {

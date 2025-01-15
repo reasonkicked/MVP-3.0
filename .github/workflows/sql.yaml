@@ -27,6 +27,11 @@ jobs:
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
 
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.6
+
       - name: Set Terraform Authentication
         run: |
           echo "ARM_CLIENT_ID=$(jq -r '.clientId' <<< '${{ secrets.AZURE_CREDENTIALS }}')" >> $GITHUB_ENV
@@ -36,7 +41,10 @@ jobs:
           echo "ARM_ACCESS_KEY=$(az storage account keys list --account-name mvp30backendsa --resource-group ts-rg-01 --query '[0].value' --output tsv)" >> $GITHUB_ENV
 
       - name: Terraform Init
-        run: terraform init -backend-config="key=${{ inputs.environment }}-${{ inputs.application_instance }}/sql.tfstate"
+        run: terraform init -backend-config=$GITHUB_WORKSPACE/terraform/backends/backend-${{ inputs.environment }}-${{ inputs.application_instance }}-sql.hcl -reconfigure
+
+      - name: Terraform Plan
+        run: terraform plan -out=plan.out -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ inputs.environment }}-${{ inputs.application_instance }}-sql.tfvars
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var-file=$GITHUB_WORKSPACE/terraform/environments/${{ inputs.environment }}-${{ inputs.application_instance }}-sql.tfvars
+        run: terraform apply plan.out
