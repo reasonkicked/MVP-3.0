@@ -66,9 +66,9 @@ module "node_0" {
 
 }
 
-module "node_0" {
+module "node_1" {
   source              = "../../modules/bits/vm"
-  vm_name             = "${module.conventions.names.aks.virtual_machine}-node-0"
+  vm_name             = "${module.conventions.names.aks.virtual_machine}-node-1"
   location            = var.location
   resource_group_name = module.aks_resource_group.name
   subnet_id           = data.terraform_remote_state.network.outputs.public_subnet_id
